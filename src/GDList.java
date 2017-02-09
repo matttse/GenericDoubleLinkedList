@@ -159,8 +159,9 @@ public class GDList<E> implements Cloneable
 	 * decrement the size
 	**/
 	public GNode deleteNode(E e){
-		// implement this method
+		GNode newNode = new GNode(e);
 		
+		return newNode;
 	}
 
 	/** delete the node which is located after the node with data e
@@ -219,7 +220,10 @@ public class GDList<E> implements Cloneable
 	 * increment the size
 	 */
 	public int addPos(E e, int pos){
-		// implement this method
+		int stat = 0;
+		
+		
+		return stat;
 	}
 	
 	/** replace the node at the specified position with a new node with e
@@ -231,7 +235,10 @@ public class GDList<E> implements Cloneable
 	 * return the pointer to the replaced node
 	 */
 	public GNode replacePos(E e, int pos){
-		// implement this method
+		// instantiate new node object with object e
+		GNode newNode = new GNode(e);
+		
+		return newNode;
 		
 	}
 	
