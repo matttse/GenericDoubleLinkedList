@@ -30,17 +30,18 @@ public class GDList<E> implements Cloneable
 		}
 		
 		public E getData() { return data; }
-		public GNode getPrevious() { return previous; }
-        public GNode getNext() { return next; }
+		public GNode<E> getPrevious() { return previous; }
+        public GNode<E> getNext() { return next; }
 		public void setData(E e) { data = e; }
-		public void setPrevious(GNode p) { previous = p; }
-        public void setNext(GNode p) { next = p; }
+		public void setPrevious(GNode<?> p) { previous = (GNode<E>) p; }
+        public void setNext(GNode<?> p) { next = (GNode<E>) p; }
 	}
    
    	
    private GNode<E> head;
    private GNode<E> tail;
    private int size;       // number of nodes in a list
+private GNode<E> prev;
    
    /** no-arg constructor creates an empty list
    **/ 
@@ -58,7 +59,7 @@ public class GDList<E> implements Cloneable
     * increment the size
    **/
    public int addToHead(E e){
-		GNode temp = new GNode(e);
+		GNode<E> temp = new GNode<E>(e);
 		if (head == null){
 			head = temp;
 			tail = temp;
@@ -82,7 +83,7 @@ public class GDList<E> implements Cloneable
 	**/
 	public int addToTail(E e){
 		
-		GNode temp = new GNode(e);
+		GNode<E> temp = new GNode<E>(e);
 		if (head == null){
 			head = temp;
 			tail = temp;
@@ -105,7 +106,7 @@ public class GDList<E> implements Cloneable
 	 * if not, create and add a new node with e after node n, and return 0
 	 * increment the size
 	**/
-	public int addAfter(GNode n, E e){
+	public int addAfter(GNode<E> n, E e){
 		
 		if (n == null)
 	         throw new IllegalArgumentException
@@ -116,8 +117,8 @@ public class GDList<E> implements Cloneable
 			addToTail(e);
 		}
 		else{
-			GNode temp = new GNode(e);
-			GNode tempNext = n.getNext();
+			GNode<E> temp = new GNode<E>(e);
+			GNode<E> tempNext = (GNode<E>) n.getNext();
 			temp.setNext(tempNext);
 			tempNext.setPrevious(temp);
 			temp.setPrevious(n);
@@ -133,7 +134,7 @@ public class GDList<E> implements Cloneable
 	 * if not, create and add a new node with e before node n, and return 0
 	 * increment the size
 	**/
-	public int addBefore(GNode n, E e){
+	public int addBefore(GNode<E> n, E e){
 		
 		if (n == null)
 	         throw new IllegalArgumentException
@@ -142,8 +143,8 @@ public class GDList<E> implements Cloneable
 		if (findNode(head, e) != null) return 1;		
 		if (n == head) addToHead(e);
 		else{
-			GNode temp = new GNode(e);
-			GNode tempPrevious = n.getPrevious();
+			GNode<E> temp = new GNode<E>(e);
+			GNode<E> tempPrevious = (GNode<E>) n.getPrevious();
 			temp.setNext(n);
 			n.setPrevious(temp);
 			tempPrevious.setNext(temp);		
@@ -158,20 +159,30 @@ public class GDList<E> implements Cloneable
 	 * if exists, delete the node and return the pointer to the deleted node
 	 * decrement the size
 	**/
-	public GNode deleteNode(E e){
-		GNode newNode = new GNode(e);
-		
-		return newNode;
+	public GNode<E> deleteNode(E e){
+		//new node with selected
+		GNode<E> temp = findNode(head, e);
+		//if selected is not there
+		if (temp == null) {
+			return null;
+		//set the data at link
+		} else {
+			temp.setData(head.getData());
+			head = (GNode<E>) head.getNext();
+			size--;
+
+		}
+		return temp;
 	}
 
 	/** delete the node which is located after the node with data e
 	 * if the node with e is tail, return null
 	 * if a node with e does not exist, return null
-	 * if a noide with e exists, delete the node after that node and return the pointer to the deleted node
+	 * if a node with e exists, delete the node after that node and return the pointer to the deleted node
 	 * decrement the size
 	**/
-	public GNode deleteAfter(E e){
-		GNode temp = findNode(head, e);
+	public GNode<E> deleteAfter(E e){
+		GNode<E> temp = findNode(head, e);
 		if (temp == tail || temp == null) return null;
 		return (deleteNode((E)temp.getNext().data));
 	}
@@ -182,8 +193,8 @@ public class GDList<E> implements Cloneable
 	 * if a node with e exists, delete the node before that node and return the pointer to the deleted node
 	 * decrement the size
 	**/
-	public GNode deleteBefore(E e){
-		GNode temp = findNode(head, e);
+	public GNode<E> deleteBefore(E e){
+		GNode<E> temp = findNode(head, e);
 		if (temp == head || temp == null) return null;
 		return (deleteNode((E)temp.getPrevious().data));
 	}
@@ -194,10 +205,10 @@ public class GDList<E> implements Cloneable
 	 * if node with e does not exist, return null
 	 * if node with e exists, return the pointer to the node
 	**/
-	public GNode findNode(GNode p, E e){
-		GNode current = p;
+	public GNode<E> findNode(GNode<E> p, E e){
+		GNode<E> current = p;
 		while (current != null && current.data != e)
-			current = current.getNext();
+			current = (GNode<E>) current.getNext();
 		return current; 
 	}
 	
@@ -206,7 +217,7 @@ public class GDList<E> implements Cloneable
 	 * n2 is not null
 	 * exchange node n1 and node n2 (do not just exchange the data).
 	**/
-	public void exchange(GNode n1, GNode n2){
+	public void exchange(GNode<E> n1, GNode<E> n2){
 		
 		// implement this method
 	}
@@ -220,10 +231,65 @@ public class GDList<E> implements Cloneable
 	 * increment the size
 	 */
 	public int addPos(E e, int pos){
+		int stat = 1;
+		GNode<E> newNode = new GNode<E>(head.data);
+
+
+	    if (head == null) {
+		    newNode.data = (E) this;
+		    newNode.next = null;
+	    	stat = 0;
+	        return stat;
+	    }
+	    if (pos == 0) {
+	        newNode.next = head;
+	        head = newNode;
+	        stat = 0;
+	        return stat;
+	    }
+	    GNode<E> prev = null;
+	    GNode<E> current = head;
+	    int i = 0;
+	    while (current !=null && i < pos) {
+	        prev = current;
+	        current = current.next;
+	        i++;
+	    }
+	    newNode.next = prev.next;
+	    prev.next = newNode;
+	    
+	    return stat;
+	    /*
 		int stat = 0;
-		
+//		int idx = 0;
+	    GNode<E> newNode = new GNode<E>(e);
+	    newNode.data = e;
+
+	    prev = findNode(head, e);
+
+	    //not previously found
+	    if (prev == null) {
+	    	for (int i = 0; i < size; i++) {
+	    		if (i == pos) {
+			        newNode.next = head;
+			        head = newNode;
+	    		}
+	    	}
+	        
+	    } else {
+
+//	    	while (newNode != null && idx < pos) {
+			prev.next = newNode;
+			newNode.setNext(prev.next);
+//	    	}
+
+	    	stat = 1;
+
+	    }
+
 		
 		return stat;
+		*/
 	}
 	
 	/** replace the node at the specified position with a new node with e
@@ -234,9 +300,9 @@ public class GDList<E> implements Cloneable
 	 * if not, create a new node with e and let it replace the node at position pos
 	 * return the pointer to the replaced node
 	 */
-	public GNode replacePos(E e, int pos){
+	public GNode<E> replacePos(E e, int pos){
 		// instantiate new node object with object e
-		GNode newNode = new GNode(e);
+		GNode<E> newNode = new GNode<E>(e);
 		
 		return newNode;
 		
@@ -245,10 +311,10 @@ public class GDList<E> implements Cloneable
 	public void printList(){
 		System.out.print("Number of nodes = " + size + ", List is: ");
 		if (head != null){
-			GNode current = head;
+			GNode<E> current = head;
 		    while (current != null){
 			   System.out.print(current.data + " ");
-			   current = current.getNext();
+			   current = (GNode<E>) current.getNext();
 		   }
 		}
 		else {
@@ -268,10 +334,12 @@ public class GDList<E> implements Cloneable
 	   names.addToTail("Smith");
 	   names.addToTail("Whatley");
 	   names.addToTail("Lewis");
+//	   names.deleteNode("Whatley");
+	   names.addPos("Whatley2", 3);
 	   System.out.println();
 	   names.printList();
 	   
-	   GNode temp;
+	   GNode<String> temp;
 	   // find and print Decker, search from head
 	   System.out.println("\nFind and print Decker. Search from head.");
 	   temp = names.findNode(names.head, "Decker");
