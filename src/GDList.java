@@ -33,15 +33,15 @@ public class GDList<E> implements Cloneable
 		public GNode<E> getPrevious() { return previous; }
         public GNode<E> getNext() { return next; }
 		public void setData(E e) { data = e; }
-		public void setPrevious(GNode<?> p) { previous = (GNode<E>) p; }
-        public void setNext(GNode<?> p) { next = (GNode<E>) p; }
+		public void setPrevious(GNode<E> p) { previous = (GNode<E>) p; }
+        public void setNext(GNode<E> p) { next = (GNode<E>) p; }
 	}
    
    	
    private GNode<E> head;
    private GNode<E> tail;
    private int size;       // number of nodes in a list
-private GNode<E> prev;
+   private GNode<E> prev;
    
    /** no-arg constructor creates an empty list
    **/ 
@@ -154,27 +154,6 @@ private GNode<E> prev;
 		return 0;
 	}
 
-	/** delete the node with data e
-	 * if a node with e does not exist, return null
-	 * if exists, delete the node and return the pointer to the deleted node
-	 * decrement the size
-	**/
-	public GNode<E> deleteNode(E e){
-		//new node with selected
-		GNode<E> temp = findNode(head, e);
-		//if selected is not there
-		if (temp == null) {
-			return null;
-		//set the data at link
-		} else {
-			temp.setData(head.getData());
-			head = (GNode<E>) head.getNext();
-			size--;
-
-		}
-		return temp;
-	}
-
 	/** delete the node which is located after the node with data e
 	 * if the node with e is tail, return null
 	 * if a node with e does not exist, return null
@@ -216,12 +195,69 @@ private GNode<E> prev;
 	 * n1 is not null
 	 * n2 is not null
 	 * exchange node n1 and node n2 (do not just exchange the data).
+	 * @reference http://stackoverflow.com/questions/37637894/java-generic-doubly-linked-list-swap
+	 *
 	**/
 	public void exchange(GNode<E> n1, GNode<E> n2){
-		
-		// implement this method
-	}
+		if (n1 == null || n2 == null || n1 == n2) {
+			return;	
+		}
 
+		GNode<E> temp1Lt = n1.previous;		
+		GNode<E> temp1Rt = n1.next;		
+		GNode<E> temp2Lt = n2.previous;
+		GNode<E> temp2Rt = n2.next;
+		temp1Lt.next = n2;
+		temp1Lt.previous = temp1Lt;
+		temp1Lt.next.next = temp1Rt;
+		System.out.print(temp1Lt.previous.data);
+		System.out.print(temp1Lt.next.data);
+		
+		System.out.print(temp1Lt.next.next.data);
+//		temp1Lt.previous = temp2Lt;
+//		temp2Lt.next = n1;
+//		temp2Lt.previous = temp1Rt;
+
+//		n1.previous = n2;
+//		n2.next = n1.next;
+	}
+	
+	/** delete the node with data e
+	 * if a node with e does not exist, return null
+	 * if exists, delete the node and return the pointer to the deleted node
+	 * decrement the size
+	**/
+	public GNode<E> deleteNode(E e){
+		//new node with selected
+		GNode<E> temp = findNode(head, e);		
+
+		//if selected is not there
+		if (temp == null) {
+			return null;
+		//set the data at link
+		} else {
+			//check head
+			if (temp.previous == null) {
+				head = head.next;
+			//check tail
+			} else if (temp.next == null) {
+				GNode<E> tempLt = temp.previous;
+				tail = tail.getPrevious();
+				tempLt.next = null;
+			//set new links
+			} else {
+				GNode<E> tempLt = temp.previous;
+				GNode<E> tempRt = temp.next;
+				tempLt.next = tempRt;
+				
+			}
+
+			size--;
+
+		}
+		return temp;
+	}
+	
 	/** add a new node with e at the specified position
 	 * pos specifies where new node is added
 	 * pos of the first element in a list is 0
@@ -232,64 +268,10 @@ private GNode<E> prev;
 	 */
 	public int addPos(E e, int pos){
 		int stat = 1;
-		GNode<E> newNode = new GNode<E>(head.data);
 
-
-	    if (head == null) {
-		    newNode.data = (E) this;
-		    newNode.next = null;
-	    	stat = 0;
-	        return stat;
-	    }
-	    if (pos == 0) {
-	        newNode.next = head;
-	        head = newNode;
-	        stat = 0;
-	        return stat;
-	    }
-	    GNode<E> prev = null;
-	    GNode<E> current = head;
-	    int i = 0;
-	    while (current !=null && i < pos) {
-	        prev = current;
-	        current = current.next;
-	        i++;
-	    }
-	    newNode.next = prev.next;
-	    prev.next = newNode;
 	    
 	    return stat;
-	    /*
-		int stat = 0;
-//		int idx = 0;
-	    GNode<E> newNode = new GNode<E>(e);
-	    newNode.data = e;
 
-	    prev = findNode(head, e);
-
-	    //not previously found
-	    if (prev == null) {
-	    	for (int i = 0; i < size; i++) {
-	    		if (i == pos) {
-			        newNode.next = head;
-			        head = newNode;
-	    		}
-	    	}
-	        
-	    } else {
-
-//	    	while (newNode != null && idx < pos) {
-			prev.next = newNode;
-			newNode.setNext(prev.next);
-//	    	}
-
-	    	stat = 1;
-
-	    }
-
-		
-		return stat;
-		*/
 	}
 	
 	/** replace the node at the specified position with a new node with e
@@ -330,12 +312,14 @@ private GNode<E> prev;
 	   names.addToHead("Decker");
 	   names.addToHead("Barbour");
 	   names.addToHead("Franklin");
-	   names.printList();	   
+	   names.printList();
+	   names.addToTail("Cow");
 	   names.addToTail("Smith");
 	   names.addToTail("Whatley");
 	   names.addToTail("Lewis");
-//	   names.deleteNode("Whatley");
-	   names.addPos("Whatley2", 3);
+//	   names.deleteNode("Lewis");
+//	   names.addPos("Whatley2", 3);
+	   names.exchange(names.head.next, names.tail.previous);
 	   System.out.println();
 	   names.printList();
 	   
