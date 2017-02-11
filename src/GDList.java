@@ -196,30 +196,57 @@ public class GDList<E> implements Cloneable
 	 * n2 is not null
 	 * exchange node n1 and node n2 (do not just exchange the data).
 	 * @reference http://stackoverflow.com/questions/37637894/java-generic-doubly-linked-list-swap
-	 *
+	 * http://stackoverflow.com/questions/27922497/java-double-linked-list-swap-node
+	 * 
 	**/
 	public void exchange(GNode<E> n1, GNode<E> n2){
-		if (n1 == null || n2 == null || n1 == n2) {
-			return;	
-		}
+	      if (n1 == n2.getPrevious() || n2 == n1.getPrevious()) {
+	          //Adjacent nodes	  
+	          //Order is relevant
+	    	  GNode<E> first;
+	    	  GNode<E> second;
+	          if (n1 == n2.getPrevious()) {
+	             first = n1;
+	             second = n2;
+	          } else {
+	             first = n2;
+	             second = n1;
+	          }
+	  
+	          first.setNext(second.getNext());
+	          second.setPrevious(first.getPrevious());
+	  
+	          if (first.getNext() != null)
+	             first.getNext().setPrevious(first);
+	  
+	          if (second.getPrevious() != null)
+	             second.getPrevious().setNext(second);
+	  
+	          second.setNext(first);
+	          first.setPrevious(second);
+	       } else {
+	          //Non adjacent
+	    	  GNode<E> prevN1 = n1.getPrevious();
+	    	  GNode<E> nextN1 = n1.getNext();
+	    	  GNode<E> prevN2 = n2.getPrevious();
+	    	  GNode<E> nextN2 = n2.getNext();
+	  
+	          n1.setPrevious(prevN2);
+	          n1.setNext(nextN2);
+	          n2.setPrevious(prevN1);
+	          n2.setNext(nextN1);
+	  
+	          if (prevN1 != null)
+	             prevN1.setNext(n2);
+	          if (nextN1 != null)
+	             nextN1.setPrevious(n2);
+	          if (prevN2 != null)
+	             prevN2.setNext(n1);
+	          if (nextN2 != null)
+	             nextN2.setPrevious(n1);
+    	  
 
-		GNode<E> temp1Lt = n1.previous;		
-		GNode<E> temp1Rt = n1.next;		
-		GNode<E> temp2Lt = n2.previous;
-		GNode<E> temp2Rt = n2.next;
-		temp1Lt.next = n2;
-		temp1Lt.previous = temp1Lt;
-		temp1Lt.next.next = temp1Rt;
-		System.out.print(temp1Lt.previous.data);
-		System.out.print(temp1Lt.next.data);
-		
-		System.out.print(temp1Lt.next.next.data);
-//		temp1Lt.previous = temp2Lt;
-//		temp2Lt.next = n1;
-//		temp2Lt.previous = temp1Rt;
-
-//		n1.previous = n2;
-//		n2.next = n1.next;
+	       }
 	}
 	
 	/** delete the node with data e
@@ -265,10 +292,32 @@ public class GDList<E> implements Cloneable
 	 * if a node with e already exists, return 1
 	 * if not, create and add a new node with e at position pos and return 0
 	 * increment the size
+	 * @resource
+	 * http://crunchify.com/how-to-implement-a-linkedlist-class-from-scratch-in-java/
+	 * https://www.java2novice.com/data-structures-in-java/linked-list/doubly-linked-list/
 	 */
 	public int addPos(E e, int pos){
 		int stat = 1;
-
+		GNode<E> temp = new GNode<E>(e);
+		GNode<E> current = head;
+ 
+		// Let's check for NPE before iterate over crunchifyCurrent
+		if (current != null) {
+			// crawl to the requested index or the last element in the list, whichever comes first
+			for (int i = 0; i < pos && current.getNext() != null; i++) {
+				current = current.getNext();
+				
+			}
+		}
+ 
+		// set the new node's next-node reference to this node's next-node reference
+		temp.setNext(current.getNext());
+ 
+		// now set this node's next-node reference to the new node
+		current.setNext(temp);
+ 
+		// increment the number of elements variable
+		size++;
 	    
 	    return stat;
 
@@ -317,9 +366,9 @@ public class GDList<E> implements Cloneable
 	   names.addToTail("Smith");
 	   names.addToTail("Whatley");
 	   names.addToTail("Lewis");
-//	   names.deleteNode("Lewis");
-//	   names.addPos("Whatley2", 3);
-	   names.exchange(names.head.next, names.tail.previous);
+//	   names.deleteNode("Cow");
+	   names.addPos("Whatley2", 0);
+//	   names.exchange(names.head.next.next, names.tail.previous.previous);
 	   System.out.println();
 	   names.printList();
 	   
