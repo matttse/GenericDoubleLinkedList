@@ -177,7 +177,7 @@ public class GDList<E> implements Cloneable
 			GNode<E> temp = new GNode<E>(e);
 			if (pos == 0) {
 				addToHead(e);
-			} else if (pos == size) {
+			} else if (pos == size || pos > size) {
 				addToTail(e);
 			} else {
 				GNode<E> current = head;
@@ -185,8 +185,7 @@ public class GDList<E> implements Cloneable
 				if (current != null) {
 					// crawl to the requested index or the last element in the list, whichever comes first
 					for (int i = 0; i < pos && current.getNext() != null; i++) {
-						current = current.getNext();
-						
+						current = current.getNext();						
 					}
 				}
 		 
@@ -250,22 +249,34 @@ public class GDList<E> implements Cloneable
 	 * http://stackoverflow.com/questions/27922497/java-double-linked-list-swap-node
 	 * 
 	**/
-	public void exchange(GNode<E> n1, GNode<E> n2){
-		/*
-		 * 		if ((n1 == head && n2 == tail)) {
-			GNode<E> temp = n1;
-			n1 = n2;
-			n2 = temp;
-			
-			temp = n1.next.previous;
-			n1.next.previous = n2.next.previous;
-			n2.next.previous = temp;
-			GNode<E> dTemp = (GNode<E>) n1.data;
-			n1.data = n2.data;
-			n2.data = (E) dTemp;
-		} else 
-		 * */
-		if (n1 == n2.getPrevious() || n2 == n1.getPrevious()) {
+	public void exchange(GNode<E> n1, GNode<E> n2){		
+ 		if (n1 == head && n2 == tail) {
+ 			GNode<E> temp = findNode(head, n1.getData());
+ 			head = n2;
+ 			temp.setNext(n1.getNext());
+ 			temp.setPrevious(null);
+ 			tail = n1;
+ 			
+		} else if (n1 == tail && n2 == head) {
+ 			GNode<E> temp = findNode(head, n2.getData());
+ 			head = n1;
+ 			temp.setNext(n2.getNext());
+ 			temp.setPrevious(null);
+ 			tail = n2;
+		
+		} else if (n1 == head && n2 != tail) {
+ 			GNode<E> temp = findNode(head, n1.getData());
+ 			head = n2;
+ 			temp.setNext(n1.getNext());
+ 			temp.setPrevious(null);
+ 			
+		} else if (n1 != head && n2 == tail) {
+			GNode<E> temp = findNode(head, n2.getData());
+			tail = n1;
+			temp.setPrevious(n2.getPrevious());
+
+		}
+ 		if (n1 == n2.getPrevious() || n2 == n1.getPrevious()) {
 	          //Adjacent nodes	  
 	          //Order is relevant
 			GNode<E> first;
@@ -337,8 +348,8 @@ public class GDList<E> implements Cloneable
 				tempLt.next = null;
 			//set new links
 			} else {
-				GNode<E> tempLt = temp.previous;
-				GNode<E> tempRt = temp.next;
+				GNode<E> tempLt = temp.getPrevious();
+				GNode<E> tempRt = temp.getNext();
 				tempLt.next = tempRt;
 				
 			}
@@ -358,10 +369,12 @@ public class GDList<E> implements Cloneable
 	 * return the pointer to the replaced node
 	 */
 	public GNode<E> replacePos(E e, int pos){
-		// instantiate new node object with object e
-		GNode<E> newNode = new GNode<E>(e);
-		
-		return newNode;
+		// instantiate temp
+		GNode<E> temp = findNode(head, e);
+		if (temp != null && pos <= size) {
+			
+		}
+		return temp;
 		
 	}
 	
@@ -392,14 +405,14 @@ public class GDList<E> implements Cloneable
 	   names.addToTail("Smith");
 	   names.addToTail("Whatley");
 	   names.addToTail("Lewis");
-//	   names.deleteNode("Cow");
-	   names.addPos("Whatley2", 7);
-	   names.addPos("Whatley2", 0);
-//	   names.exchange(names.head.next, names.tail.previous);
-//	   names.exchange(names.head.next.next, names.tail.previous.previous);
+//	   names.deleteNode("Franklin");
+//	   names.addPos("Whatley2", 7);
+//	   names.addPos("Whatley2", 0);
+//	   names.exchange(names.head.next.next.next.next, names.tail.previous);
+	   names.exchange(names.head.next, names.tail);
 	   System.out.println();
 	   names.printList();
-	   
+	   /*
 	   GNode<String> temp;
 	   // find and print Decker, search from head
 	   System.out.println("\nFind and print Decker. Search from head.");
@@ -415,7 +428,7 @@ public class GDList<E> implements Cloneable
 		   names.addAfter(temp, "Morse");
 	   System.out.println();
 	   names.printList();
-
+	   */
 	}
 }
            
