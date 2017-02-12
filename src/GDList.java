@@ -176,9 +176,9 @@ public class GDList<E> implements Cloneable
 			
 			GNode<E> temp = new GNode<E>(e);
 			if (pos == 0) {
-				head = temp;
-//				tail = 
-				
+				addToHead(e);
+			} else if (pos == size) {
+				addToTail(e);
 			} else {
 				GNode<E> current = head;
 				// Let's check for NPE before iterate over crunchifyCurrent
@@ -393,8 +393,9 @@ public class GDList<E> implements Cloneable
 	   names.addToTail("Whatley");
 	   names.addToTail("Lewis");
 //	   names.deleteNode("Cow");
-//	   names.addPos("Whatley2", 0);
-	   names.exchange(names.head.next, names.tail.previous);
+	   names.addPos("Whatley2", 7);
+	   names.addPos("Whatley2", 0);
+//	   names.exchange(names.head.next, names.tail.previous);
 //	   names.exchange(names.head.next.next, names.tail.previous.previous);
 	   System.out.println();
 	   names.printList();
