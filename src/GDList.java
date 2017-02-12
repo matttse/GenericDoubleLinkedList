@@ -51,54 +51,7 @@ public class GDList<E> implements Cloneable
       head = null;
       tail = null;
       size = 0;
-   }
-   
-   /** add a new node with data e to the head
-    * if a node with e already exists, return 1
-    * if not, create and add a new node with e to the head (this new node is the head now), and return 0
-    * increment the size
-   **/
-   public int addToHead(E e){
-		GNode<E> temp = new GNode<E>(e);
-		if (head == null){
-			head = temp;
-			tail = temp;
-		}
-		else{
-			if (findNode(head, e) == null) {
-				temp.setNext(head);
-				head.setPrevious(temp);
-				head = temp;
-			}
-			else return 1;
-		}
-		size++;
-		return 0;
-	}
-   
-	/** add a new node with data e to the tail
-	 * if a node with e already exists, return 1
-	 * if not, creatre and add a new node with e to the tail (this new node is the tail now), and return 0
-	 * increment the size
-	**/
-	public int addToTail(E e){
-		
-		GNode<E> temp = new GNode<E>(e);
-		if (head == null){
-			head = temp;
-			tail = temp;
-		}
-		else{
-			if (findNode(head, e) == null){
-				temp.setPrevious(tail);
-				tail.setNext(temp);
-				tail = temp;
-			}
-			else return 1;
-		}
-		size++;
-		return 0;
-	}
+   }	
 	
 	/** insert a new node with data e after node n
 	 * n is not null
@@ -153,6 +106,104 @@ public class GDList<E> implements Cloneable
 		}		
 		return 0;
 	}
+	
+	   /** add a new node with data e to the head
+	    * if a node with e already exists, return 1
+	    * if not, create and add a new node with e to the head (this new node is the head now), and return 0
+	    * increment the size
+	   **/
+	   public int addToHead(E e){
+			GNode<E> temp = new GNode<E>(e);
+			if (head == null){
+				head = temp;
+				tail = temp;
+			}
+			else{
+				if (findNode(head, e) == null) {
+					temp.setNext(head);
+					head.setPrevious(temp);
+					head = temp;
+				}
+				else return 1;
+			}
+			size++;
+			return 0;
+		}
+	   
+		/** add a new node with data e to the tail
+		 * if a node with e already exists, return 1
+		 * if not, creatre and add a new node with e to the tail (this new node is the tail now), and return 0
+		 * increment the size
+		**/
+		public int addToTail(E e){
+			
+			GNode<E> temp = new GNode<E>(e);
+			if (head == null){
+				head = temp;
+				tail = temp;
+			}
+			else{
+				if (findNode(head, e) == null){
+					temp.setPrevious(tail);
+					tail.setNext(temp);
+					tail = temp;
+					
+				}
+				else return 1;
+			}
+			size++;
+			return 0;
+		}
+		
+		/** add a new node with e at the specified position
+		 * pos specifies where new node is added
+		 * pos of the first element in a list is 0
+		 * pos >= 0
+		 * if a node with e already exists, return 1
+		 * if not, create and add a new node with e at position pos and return 0
+		 * increment the size
+		 * @resource
+		 * http://crunchify.com/how-to-implement-a-linkedlist-class-from-scratch-in-java/
+		 * https://www.java2novice.com/data-structures-in-java/linked-list/doubly-linked-list/
+		 */
+		public int addPos(E e, int pos){
+			int stat = 0;
+			
+			if (findNode(head, e) != null) {
+				stat = 1;
+				return stat;
+			}
+			
+			GNode<E> temp = new GNode<E>(e);
+			if (pos == 0) {
+				head = temp;
+//				tail = 
+				
+			} else {
+				GNode<E> current = head;
+				// Let's check for NPE before iterate over crunchifyCurrent
+				if (current != null) {
+					// crawl to the requested index or the last element in the list, whichever comes first
+					for (int i = 0; i < pos && current.getNext() != null; i++) {
+						current = current.getNext();
+						
+					}
+				}
+		 
+				// set the new node's next-node reference to this node's next-node reference
+				temp.setNext(current.getNext());
+				current.setPrevious(temp);
+		 
+				// now set this node's next-node reference to the new node
+				current.setNext(temp);
+		 
+				// increment the number of elements variable
+				size++;
+			}
+		    
+		    return stat;
+
+		}
 
 	/** delete the node which is located after the node with data e
 	 * if the node with e is tail, return null
@@ -200,54 +251,67 @@ public class GDList<E> implements Cloneable
 	 * 
 	**/
 	public void exchange(GNode<E> n1, GNode<E> n2){
-	      if (n1 == n2.getPrevious() || n2 == n1.getPrevious()) {
+		/*
+		 * 		if ((n1 == head && n2 == tail)) {
+			GNode<E> temp = n1;
+			n1 = n2;
+			n2 = temp;
+			
+			temp = n1.next.previous;
+			n1.next.previous = n2.next.previous;
+			n2.next.previous = temp;
+			GNode<E> dTemp = (GNode<E>) n1.data;
+			n1.data = n2.data;
+			n2.data = (E) dTemp;
+		} else 
+		 * */
+		if (n1 == n2.getPrevious() || n2 == n1.getPrevious()) {
 	          //Adjacent nodes	  
 	          //Order is relevant
-	    	  GNode<E> first;
-	    	  GNode<E> second;
-	          if (n1 == n2.getPrevious()) {
-	             first = n1;
-	             second = n2;
-	          } else {
-	             first = n2;
-	             second = n1;
-	          }
+			GNode<E> first;
+			GNode<E> second;
+			if (n1 == n2.getPrevious()) {
+				first = n1;
+				second = n2;
+			} else {
+				first = n2;
+				second = n1;
+			}
 	  
-	          first.setNext(second.getNext());
-	          second.setPrevious(first.getPrevious());
+			first.setNext(second.getNext());
+			second.setPrevious(first.getPrevious());
 	  
-	          if (first.getNext() != null)
-	             first.getNext().setPrevious(first);
+			if (first.getNext() != null)
+				first.getNext().setPrevious(first);
 	  
-	          if (second.getPrevious() != null)
-	             second.getPrevious().setNext(second);
+			if (second.getPrevious() != null)
+				second.getPrevious().setNext(second);
 	  
-	          second.setNext(first);
-	          first.setPrevious(second);
-	       } else {
-	          //Non adjacent
-	    	  GNode<E> prevN1 = n1.getPrevious();
-	    	  GNode<E> nextN1 = n1.getNext();
-	    	  GNode<E> prevN2 = n2.getPrevious();
-	    	  GNode<E> nextN2 = n2.getNext();
-	  
-	          n1.setPrevious(prevN2);
-	          n1.setNext(nextN2);
-	          n2.setPrevious(prevN1);
-	          n2.setNext(nextN1);
-	  
-	          if (prevN1 != null)
-	             prevN1.setNext(n2);
-	          if (nextN1 != null)
-	             nextN1.setPrevious(n2);
-	          if (prevN2 != null)
-	             prevN2.setNext(n1);
-	          if (nextN2 != null)
-	             nextN2.setPrevious(n1);
-    	  
-
-	       }
+				second.setNext(first);
+				first.setPrevious(second);
+			} else {
+				//Non adjacent
+				GNode<E> prevN1 = n1.getPrevious();
+				GNode<E> nextN1 = n1.getNext();
+				GNode<E> prevN2 = n2.getPrevious();
+				GNode<E> nextN2 = n2.getNext();
+			  
+				n1.setPrevious(prevN2);
+				n1.setNext(nextN2);
+				n2.setPrevious(prevN1);
+				n2.setNext(nextN1);
+			  
+				if (prevN1 != null)
+					prevN1.setNext(n2);
+				if (nextN1 != null)
+					nextN1.setPrevious(n2);
+				if (prevN2 != null)
+					prevN2.setNext(n1);
+				if (nextN2 != null)
+					nextN2.setPrevious(n1);
+			}
 	}
+		    	  
 	
 	/** delete the node with data e
 	 * if a node with e does not exist, return null
@@ -283,44 +347,6 @@ public class GDList<E> implements Cloneable
 
 		}
 		return temp;
-	}
-	
-	/** add a new node with e at the specified position
-	 * pos specifies where new node is added
-	 * pos of the first element in a list is 0
-	 * pos >= 0
-	 * if a node with e already exists, return 1
-	 * if not, create and add a new node with e at position pos and return 0
-	 * increment the size
-	 * @resource
-	 * http://crunchify.com/how-to-implement-a-linkedlist-class-from-scratch-in-java/
-	 * https://www.java2novice.com/data-structures-in-java/linked-list/doubly-linked-list/
-	 */
-	public int addPos(E e, int pos){
-		int stat = 1;
-		GNode<E> temp = new GNode<E>(e);
-		GNode<E> current = head;
- 
-		// Let's check for NPE before iterate over crunchifyCurrent
-		if (current != null) {
-			// crawl to the requested index or the last element in the list, whichever comes first
-			for (int i = 0; i < pos && current.getNext() != null; i++) {
-				current = current.getNext();
-				
-			}
-		}
- 
-		// set the new node's next-node reference to this node's next-node reference
-		temp.setNext(current.getNext());
- 
-		// now set this node's next-node reference to the new node
-		current.setNext(temp);
- 
-		// increment the number of elements variable
-		size++;
-	    
-	    return stat;
-
 	}
 	
 	/** replace the node at the specified position with a new node with e
@@ -367,7 +393,8 @@ public class GDList<E> implements Cloneable
 	   names.addToTail("Whatley");
 	   names.addToTail("Lewis");
 //	   names.deleteNode("Cow");
-	   names.addPos("Whatley2", 0);
+//	   names.addPos("Whatley2", 0);
+	   names.exchange(names.head.next, names.tail.previous);
 //	   names.exchange(names.head.next.next, names.tail.previous.previous);
 	   System.out.println();
 	   names.printList();
