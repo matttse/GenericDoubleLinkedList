@@ -167,41 +167,198 @@ public class GDList<E> implements Cloneable
 		 * https://www.java2novice.com/data-structures-in-java/linked-list/doubly-linked-list/
 		 */
 		public int addPos(E e, int pos){
+			//return val default to 0
 			int stat = 0;
-			
+			//only if already exists
 			if (findNode(head, e) != null) {
 				stat = 1;
 				return stat;
 			}
-			
-			GNode<E> temp = new GNode<E>(e);
-			if (pos == 0) {
-				addToHead(e);
-			} else if (pos == size || pos > size) {
-				addToTail(e);
-			} else {
-				GNode<E> current = head;
-				// Let's check for NPE before iterate over crunchifyCurrent
-				if (current != null) {
-					// crawl to the requested index or the last element in the list, whichever comes first
-					for (int i = 0; i < pos && current.getNext() != null; i++) {
-						current = current.getNext();						
-					}
+			//do nothing if position is less than 0
+			if (pos >= 0) {
+				//temp node 
+				GNode<E> temp = new GNode<E>(e);
+				//at the beginning
+				if (pos == 0) {
+					addToHead(e);
+				//at the end
+				} else if (pos == size || pos > size) {
+					addToTail(e);
+				} else {
+					GNode<E> current = head;
+					//check for exception before iterate over current
+					if (current != null) {
+						//loop to the requested index or the last element in the list
+						for (int cnt = 0; cnt < pos - 1 && current.getNext() != null; cnt++) {
+							current = current.getNext();						
+						}
+					}			 
+					//set the new node's next-node reference to this node's next-node reference
+					temp.setNext(current.getNext());
+					current.setPrevious(temp);			 
+					//set this node's next-node reference to the new node
+					current.setNext(temp);			 
+					//update size
+					size++;
 				}
-		 
-				// set the new node's next-node reference to this node's next-node reference
-				temp.setNext(current.getNext());
-				current.setPrevious(temp);
-		 
-				// now set this node's next-node reference to the new node
-				current.setNext(temp);
-		 
-				// increment the number of elements variable
-				size++;
-			}
-		    
+			}		    
 		    return stat;
-
+		}
+		
+		/** delete the node with data e
+		 * if a node with e does not exist, return null
+		 * if exists, delete the node and return the pointer to the deleted node
+		 * decrement the size
+		**/
+		public GNode<E> deleteNode(E e){
+			//new node with selected
+			GNode<E> temp = findNode(head, e);		
+			//if selected is not there
+			if (temp == null) {
+				return null;
+			//set the data at link
+			} else {
+				//check head
+				if (temp.previous == null) {
+					head = head.getNext();
+				//check tail
+				} else if (temp.next == null) {					
+					tail = tail.getPrevious();					
+				//set new links
+				} else {
+					GNode<E> tempLt = temp.getPrevious();
+					GNode<E> tempRt = temp.getNext();
+					tempLt.next = tempRt;					
+				}
+				//update size
+				size--;
+			}
+			return temp;
+		}
+		
+		/** replace the node at the specified position with a new node with e
+		 * pos specifies the position of the node to be replaced
+		 * pos of the first element in a list is 0
+		 * pos >= 0
+		 * if a node with e already exists, return null
+		 * if not, create a new node with e and let it replace the node at position pos
+		 * return the pointer to the replaced node
+		 */
+		public GNode<E> replacePos(E e, int pos){
+			//temp node
+			GNode<E> temp = findNode(head, e);
+			if (temp == null && pos < size) {
+				//check head
+				if (pos == 0) {
+					head = head.getNext();
+					addToHead(e);
+				//check tail and adjust for index
+				} else if (pos == (size - 1)) {
+					tail = tail.getPrevious();
+					addToTail(e);
+				} else {
+					//add to position
+					GNode<E> newNode = new GNode<E>(e);
+					GNode<E> current = head;
+					//check for exception before iterate over current
+					if (current != null) {
+						//loop to the requested index or the last element in the list
+						for (int cnt = 0; cnt < pos && current.getNext() != null; cnt++) {
+							current = current.getNext();						
+						}
+					}			 
+					//set the new node's next-node reference to this node's next-node reference
+					newNode.setNext(current.getNext().getNext());
+					current.setPrevious(newNode);			 
+					//set this node's next-node reference to the new node
+					current.setNext(newNode);					
+				}
+			}			
+			
+			return temp;
+			
+		}	
+		
+		/** exchange two nodes n1 and n2
+		 * n1 is not null
+		 * n2 is not null
+		 * exchange node n1 and node n2 (do not just exchange the data).
+		 * @reference http://stackoverflow.com/questions/37637894/java-generic-doubly-linked-list-swap
+		 * http://stackoverflow.com/questions/27922497/java-double-linked-list-swap-node
+		 * 
+		**/
+		public void exchange(GNode<E> n1, GNode<E> n2){	
+			//check head and tail
+	 		if (n1 == head && n2 == tail) {
+	 			GNode<E> temp = findNode(head, n1.getData());
+	 			head = n2;
+	 			temp.setNext(n1.getNext());
+	 			temp.setPrevious(null);
+	 			tail = n1;
+	 		//check tail and head	
+			} else if (n1 == tail && n2 == head) {
+	 			GNode<E> temp = findNode(head, n2.getData());
+	 			head = n1;
+	 			temp.setNext(n2.getNext());
+	 			temp.setPrevious(null);
+	 			tail = n2;
+			//update only head
+			} else if (n1 == head && n2 != tail) {
+	 			GNode<E> temp = findNode(head, n1.getData());
+	 			head = n2;
+	 			temp.setNext(n1.getNext());
+	 			temp.setPrevious(null);
+	 		//update only tail	
+			} else if (n1 != head && n2 == tail) {
+				GNode<E> temp = findNode(head, n2.getData());
+				tail = n1;
+				temp.setPrevious(n2.getPrevious());
+			}
+	 		//Adjacent nodes
+	 		if (n1 == n2.getPrevious() || n2 == n1.getPrevious()) {
+		        //Order is relevant
+				GNode<E> first;
+				GNode<E> second;
+				if (n1 == n2.getPrevious()) {
+					first = n1;
+					second = n2;
+				} else {
+					first = n2;
+					second = n1;
+				}
+		  
+				first.setNext(second.getNext());
+				second.setPrevious(first.getPrevious());
+		  
+				if (first.getNext() != null)
+					first.getNext().setPrevious(first);
+		  
+				if (second.getPrevious() != null)
+					second.getPrevious().setNext(second);
+		  
+					second.setNext(first);
+					first.setPrevious(second);
+				//Non adjacent
+				} else {				
+					GNode<E> prevN1 = n1.getPrevious();
+					GNode<E> nextN1 = n1.getNext();
+					GNode<E> prevN2 = n2.getPrevious();
+					GNode<E> nextN2 = n2.getNext();
+				  
+					n1.setPrevious(prevN2);
+					n1.setNext(nextN2);
+					n2.setPrevious(prevN1);
+					n2.setNext(nextN1);
+				  
+					if (prevN1 != null)
+						prevN1.setNext(n2);
+					if (nextN1 != null)
+						nextN1.setPrevious(n2);
+					if (prevN2 != null)
+						prevN2.setNext(n1);
+					if (nextN2 != null)
+						nextN2.setPrevious(n1);
+				}
 		}
 
 	/** delete the node which is located after the node with data e
@@ -240,144 +397,7 @@ public class GDList<E> implements Cloneable
 			current = (GNode<E>) current.getNext();
 		return current; 
 	}
-	
-	/** exchange two nodes n1 and n2
-	 * n1 is not null
-	 * n2 is not null
-	 * exchange node n1 and node n2 (do not just exchange the data).
-	 * @reference http://stackoverflow.com/questions/37637894/java-generic-doubly-linked-list-swap
-	 * http://stackoverflow.com/questions/27922497/java-double-linked-list-swap-node
-	 * 
-	**/
-	public void exchange(GNode<E> n1, GNode<E> n2){		
- 		if (n1 == head && n2 == tail) {
- 			GNode<E> temp = findNode(head, n1.getData());
- 			head = n2;
- 			temp.setNext(n1.getNext());
- 			temp.setPrevious(null);
- 			tail = n1;
- 			
-		} else if (n1 == tail && n2 == head) {
- 			GNode<E> temp = findNode(head, n2.getData());
- 			head = n1;
- 			temp.setNext(n2.getNext());
- 			temp.setPrevious(null);
- 			tail = n2;
-		
-		} else if (n1 == head && n2 != tail) {
- 			GNode<E> temp = findNode(head, n1.getData());
- 			head = n2;
- 			temp.setNext(n1.getNext());
- 			temp.setPrevious(null);
- 			
-		} else if (n1 != head && n2 == tail) {
-			GNode<E> temp = findNode(head, n2.getData());
-			tail = n1;
-			temp.setPrevious(n2.getPrevious());
 
-		}
- 		if (n1 == n2.getPrevious() || n2 == n1.getPrevious()) {
-	          //Adjacent nodes	  
-	          //Order is relevant
-			GNode<E> first;
-			GNode<E> second;
-			if (n1 == n2.getPrevious()) {
-				first = n1;
-				second = n2;
-			} else {
-				first = n2;
-				second = n1;
-			}
-	  
-			first.setNext(second.getNext());
-			second.setPrevious(first.getPrevious());
-	  
-			if (first.getNext() != null)
-				first.getNext().setPrevious(first);
-	  
-			if (second.getPrevious() != null)
-				second.getPrevious().setNext(second);
-	  
-				second.setNext(first);
-				first.setPrevious(second);
-			} else {
-				//Non adjacent
-				GNode<E> prevN1 = n1.getPrevious();
-				GNode<E> nextN1 = n1.getNext();
-				GNode<E> prevN2 = n2.getPrevious();
-				GNode<E> nextN2 = n2.getNext();
-			  
-				n1.setPrevious(prevN2);
-				n1.setNext(nextN2);
-				n2.setPrevious(prevN1);
-				n2.setNext(nextN1);
-			  
-				if (prevN1 != null)
-					prevN1.setNext(n2);
-				if (nextN1 != null)
-					nextN1.setPrevious(n2);
-				if (prevN2 != null)
-					prevN2.setNext(n1);
-				if (nextN2 != null)
-					nextN2.setPrevious(n1);
-			}
-	}
-		    	  
-	
-	/** delete the node with data e
-	 * if a node with e does not exist, return null
-	 * if exists, delete the node and return the pointer to the deleted node
-	 * decrement the size
-	**/
-	public GNode<E> deleteNode(E e){
-		//new node with selected
-		GNode<E> temp = findNode(head, e);		
-
-		//if selected is not there
-		if (temp == null) {
-			return null;
-		//set the data at link
-		} else {
-			//check head
-			if (temp.previous == null) {
-				head = head.next;
-			//check tail
-			} else if (temp.next == null) {
-				GNode<E> tempLt = temp.previous;
-				tail = tail.getPrevious();
-				tempLt.next = null;
-			//set new links
-			} else {
-				GNode<E> tempLt = temp.getPrevious();
-				GNode<E> tempRt = temp.getNext();
-				tempLt.next = tempRt;
-				
-			}
-
-			size--;
-
-		}
-		return temp;
-	}
-	
-	/** replace the node at the specified position with a new node with e
-	 * pos specifies the position of the node to be replaced
-	 * pos of the first element in a list is 0
-	 * pos >= 0
-	 * if a node with e already exists, return null
-	 * if not, create a new node with e and let it replace the node at position pos
-	 * return the pointer to the replaced node
-	 */
-	public GNode<E> replacePos(E e, int pos){
-		// instantiate temp
-		GNode<E> temp = findNode(head, e);
-		if (temp != null && pos <= size) {
-			
-		}
-		return temp;
-		
-	}
-	
 	public void printList(){
 		System.out.print("Number of nodes = " + size + ", List is: ");
 		if (head != null){
@@ -405,14 +425,17 @@ public class GDList<E> implements Cloneable
 	   names.addToTail("Smith");
 	   names.addToTail("Whatley");
 	   names.addToTail("Lewis");
-//	   names.deleteNode("Franklin");
-//	   names.addPos("Whatley2", 7);
-//	   names.addPos("Whatley2", 0);
-//	   names.exchange(names.head.next.next.next.next, names.tail.previous);
+	   names.deleteNode("Lewis");
+	   names.deleteNode("Franklin");
+	   names.addPos("Whatley2", 7);
+	   names.addPos("Whatley2", 0);
+	   names.exchange(names.head.next.next.next.next, names.tail.previous);
 	   names.exchange(names.head.next, names.tail);
+	   names.replacePos("cow2", 7);
+	   names.deleteNode("Cow");
 	   System.out.println();
 	   names.printList();
-	   /*
+	   
 	   GNode<String> temp;
 	   // find and print Decker, search from head
 	   System.out.println("\nFind and print Decker. Search from head.");
@@ -428,7 +451,7 @@ public class GDList<E> implements Cloneable
 		   names.addAfter(temp, "Morse");
 	   System.out.println();
 	   names.printList();
-	   */
+	   
 	}
 }
            
